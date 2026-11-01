@@ -1,8 +1,8 @@
 # Production domain: tinydeskai.tools
 
-Status: applied for the public site. Local `APP_URL` stays `http://localhost:5020`.
+The Worker is attached with a route on the existing proxied DNS for `tinydeskai.tools`. A Workers custom domain was not used, because the apex already has DNS records and this login cannot replace them.
 
-Production origin: `https://tinydeskai.tools`
+Production origin: `https://tinydeskai.tools`. Local `APP_URL` stays `http://localhost:5020`.
 
 Set together for this deploy:
 

@@ -7,8 +7,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
   "upload_source_maps": true,
-  // Add your domain before deploying.
-  "routes": [{ "pattern": "tinydeskai.tools", "custom_domain": true }],
+  // Route on the existing proxied DNS. A Workers custom domain cannot replace the apex records already on the zone.
+  "routes": [{ "pattern": "tinydeskai.tools/*", "zone_name": "tinydeskai.tools" }],
   "vars": {
     "APP_URL": "https://tinydeskai.tools",
     "EMAIL_FROM": "noreply@tinydeskai.tools",
