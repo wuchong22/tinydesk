@@ -6,7 +6,7 @@ import { defineSite } from '@shipwords/core/site';
 export default defineSite({
   id: 'tinydeskaiex',
   name: 'Tiny Desk AI',
-  url: 'https://tinydeskai.example.com',
+  url: 'https://tinydeskai.tools',
   locales: ['en'],
   defaultLocale: 'en',
   // Same price for 1–5 people; one video = 10 credits. Each video costs about $3.06 upstream (Kling 4.0, 720p, one run).

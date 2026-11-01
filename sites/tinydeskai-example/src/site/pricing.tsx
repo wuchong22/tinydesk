@@ -105,6 +105,7 @@ export function Plans({
   const { checkout, pending, error } = useCheckout();
 
   function buy(productId: string) {
+    if (!config.paymentsEnabled) return;
     // After paying, return to the generator; stage photos restore from sessionStorage (tool.tsx).
     const start = () => {
       track('checkout_start', { product: productId, source });
@@ -143,12 +144,14 @@ export function Plans({
               <button
                 type="button"
                 className={featured ? 'plan-buy primary' : 'plan-buy'}
-                disabled={pending !== null}
+                disabled={!config.paymentsEnabled || pending !== null}
                 onClick={() => buy(product.id)}
               >
-                {pending === product.id
-                  ? m.common_plan_redirecting()
-                  : m.common_plan_buy({ name: packName(product) })}
+                {!config.paymentsEnabled
+                  ? 'Payments are not available yet'
+                  : pending === product.id
+                    ? m.common_plan_redirecting()
+                    : m.common_plan_buy({ name: packName(product) })}
               </button>
             </article>
           );
@@ -161,6 +164,12 @@ export function Plans({
 
 /** Payment notes under the cards: reassuring facts first, expectations squeezed into one small line. */
 export function BeforeYouPay() {
+  const config = root.useLoaderData();
+  if (!config.paymentsEnabled) {
+    return (
+      <p className="plan-fine">Payments are not available yet. Checkout stays closed until Stripe is configured.</p>
+    );
+  }
   return (
     <div className="before-pay">
       <p className="plan-trust">

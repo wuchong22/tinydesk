@@ -21,6 +21,13 @@ export interface BillingDeps {
   log: (message: string, details: Record<string, unknown>) => void;
 }
 
+function paymentsClosed(deps: BillingDeps): Response | null {
+  if ('configured' in deps.provider && deps.provider.configured === false) {
+    return errorResponse(503, 'payments_unavailable', 'Payments are not available yet.');
+  }
+  return null;
+}
+
 const reconcileCtx = (deps: BillingDeps): ReconcileContext => ({
   db: deps.db,
   site: deps.site,
@@ -48,6 +55,8 @@ async function ensureCustomer(deps: BillingDeps, user: SessionUser): Promise<str
 
 /** POST { productId, returnPath? } → { url }: creates an order and redirects to the provider's checkout. */
 export async function handleCheckout(deps: BillingDeps, request: Request): Promise<Response> {
+  const closed = paymentsClosed(deps);
+  if (closed) return closed;
   const user = await deps.getUser(request);
   if (!user) return errorResponse(401, 'unauthorized');
   const body = await readJson<{ productId?: string; returnPath?: string }>(request);
@@ -83,6 +92,8 @@ export async function handleCheckout(deps: BillingDeps, request: Request): Promi
 
 /** POST { orderId } → { status }: the return page pulls provider state once instead of waiting for the webhook. */
 export async function handleSyncOrder(deps: BillingDeps, request: Request): Promise<Response> {
+  const closed = paymentsClosed(deps);
+  if (closed) return closed;
   const user = await deps.getUser(request);
   if (!user) return errorResponse(401, 'unauthorized');
   const body = await readJson<{ orderId?: string }>(request);
@@ -101,6 +112,8 @@ export async function handleSyncOrder(deps: BillingDeps, request: Request): Prom
 
 /** POST /api/webhooks/<provider>: verify → dedupe → fetch latest state and store → 200. Returns 500 on failure so the provider retries. */
 export async function handleWebhook(deps: BillingDeps, request: Request): Promise<Response> {
+  const closed = paymentsClosed(deps);
+  if (closed) return closed;
   let trigger: Awaited<ReturnType<PaymentProvider['parseWebhook']>>;
   try {
     trigger = await deps.provider.parseWebhook(request);
@@ -139,6 +152,8 @@ export async function handleWebhook(deps: BillingDeps, request: Request): Promis
 
 /** POST { returnPath? } → { url }: redirects to the provider's billing management page (cancel subscription, update card, invoices). */
 export async function handlePortal(deps: BillingDeps, request: Request): Promise<Response> {
+  const closed = paymentsClosed(deps);
+  if (closed) return closed;
   const user = await deps.getUser(request);
   if (!user) return errorResponse(401, 'unauthorized');
   const customer = await deps.db.query.billingCustomers.findFirst({
@@ -155,6 +170,8 @@ export async function handlePortal(deps: BillingDeps, request: Request): Promise
 
 /** GET ?order=<order ID> → 302 to this payment's receipt page at the provider. Only for the user's own paid orders. */
 export async function handleReceipt(deps: BillingDeps, request: Request): Promise<Response> {
+  const closed = paymentsClosed(deps);
+  if (closed) return closed;
   const user = await deps.getUser(request);
   if (!user) return errorResponse(401, 'unauthorized');
   const orderId = new URL(request.url).searchParams.get('order');

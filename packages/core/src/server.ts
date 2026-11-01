@@ -14,6 +14,7 @@ import {
 import { PayPalProvider } from './billing/paypal';
 import type { PaymentProvider } from './billing/provider';
 import { StripeProvider } from './billing/stripe';
+import { UnavailableProvider } from './billing/unavailable';
 import { getBalance } from './credits/ledger';
 import { createDb, type Db } from './db/client';
 import type { CoreEnv } from './env';
@@ -37,6 +38,7 @@ function required(env: CoreEnv, name: keyof CoreEnv): string {
 
 function createProvider(site: SiteConfig, env: CoreEnv): PaymentProvider {
   if (site.billing.provider === 'paypal') {
+    if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET) return new UnavailableProvider('paypal');
     return new PayPalProvider({
       clientId: required(env, 'PAYPAL_CLIENT_ID'),
       clientSecret: required(env, 'PAYPAL_CLIENT_SECRET'),
@@ -46,6 +48,7 @@ function createProvider(site: SiteConfig, env: CoreEnv): PaymentProvider {
       products: site.products,
     });
   }
+  if (!env.STRIPE_SECRET_KEY || !env.STRIPE_WEBHOOK_SECRET) return new UnavailableProvider('stripe');
   return new StripeProvider({
     secretKey: required(env, 'STRIPE_SECRET_KEY'),
     webhookSecret: required(env, 'STRIPE_WEBHOOK_SECRET'),

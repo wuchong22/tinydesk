@@ -19,6 +19,9 @@ const SKIP = [
   /migrations\/meta\//,
 ];
 const PLACEHOLDER_HOST = /(^|\.)(example\.(com|org|net)|test|invalid|localhost|users\.noreply\.github\.com)$/;
+// This product's public addresses. They have to be in the deployed config; they are not private credentials.
+const SITE_HOST = /(^|\.)tinydeskai\.tools$/;
+const SITE_RESOURCE_IDS = new Set(['dae881ef-8e04-4638-a39c-1125a7de6eb2']);
 
 /** Each rule: a global pattern and an optional ok(match, relPath) that accepts known-public matches. */
 const RULES = [
@@ -26,7 +29,7 @@ const RULES = [
   {
     name: 'email address',
     pattern: /\b[\w.+-]+@([\w-]+(?:\.[\w-]+)*\.[a-z]{2,})\b/gi,
-    ok: (m) => PLACEHOLDER_HOST.test(m[1].toLowerCase()),
+    ok: (m) => PLACEHOLDER_HOST.test(m[1].toLowerCase()) || SITE_HOST.test(m[1].toLowerCase()),
   },
   {
     name: 'GA4 measurement ID',
@@ -37,7 +40,7 @@ const RULES = [
   {
     name: 'UUID (D1 database, account or deployment ID)',
     pattern: /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g,
-    ok: (m) => m[0].startsWith('00000000-'),
+    ok: (m) => m[0].startsWith('00000000-') || SITE_RESOURCE_IDS.has(m[0]),
   },
   { name: 'live payment key', pattern: /\b(?:sk|rk|pk)_live_[A-Za-z0-9]+|\bwhsec_[A-Za-z0-9]{20,}/g },
   { name: '32-hex ID (Cloudflare account or verification token)', pattern: /\b[0-9a-f]{32}\b/g },

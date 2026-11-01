@@ -382,6 +382,7 @@ export function TinyDeskTool({
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    if (!config.generationEnabled) return;
     // blocked records which step this click stopped at; none means generation starts.
     const click = (blocked: string) => track('generate_click', { faces: own.length, blocked });
     // The button stays enabled: with no photo of your own (all dogs or all empty) it opens the lead's picker, without consent it asks to tick it, rather than looking disabled.
@@ -543,8 +544,10 @@ export function TinyDeskTool({
         <p className="notice">{m.common_tool_dogs_left({ count: dogsLeft, total: SLOTS.length })}</p>
       )}
       <div className="hero-actions">
-        <button type="submit" className="primary" disabled={submitting || preparing}>
-          {submitting || preparing ? (
+        <button type="submit" className="primary" disabled={!config.generationEnabled || submitting || preparing}>
+          {!config.generationEnabled ? (
+            'Video generation is not available yet'
+          ) : submitting || preparing ? (
             m.common_tool_starting()
           ) : (
             <>
