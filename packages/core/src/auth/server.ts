@@ -14,6 +14,19 @@ import type { SiteConfig } from '../site';
 import { isDisposableEmail } from './disposable';
 
 const DAY = 86_400_000;
+
+// Better Auth email-OTP plugin routes. Listed so a site that turns the plugin off also 404s these paths.
+const EMAIL_OTP_PATHS = [
+  '/email-otp/send-verification-otp',
+  '/email-otp/check-verification-otp',
+  '/email-otp/verify-email',
+  '/sign-in/email-otp',
+  '/email-otp/request-password-reset',
+  '/email-otp/reset-password',
+  '/forget-password/email-otp',
+  '/email-otp/request-email-change',
+  '/email-otp/change-email',
+];
 export const ATTRIBUTION_COOKIE = 'sh_attr';
 
 export interface AuthDeps {
@@ -105,8 +118,9 @@ export function createAuth(deps: AuthDeps) {
     appName: site.name,
     baseURL: deps.baseURL,
     secret: authSecret(env),
-    // Email change links are signed with the secret and sign the user in; we only use email OTP and Google, so the route stays off.
-    disabledPaths: ['/verify-email'],
+    // Email change links are signed with the secret and sign the user in, so that route stays off.
+    // A site that sets auth.emailOtp to false also has no email-code sign-in; job notification mail is separate.
+    disabledPaths: ['/verify-email', ...(site.auth?.emailOtp === false ? EMAIL_OTP_PATHS : [])],
     database: drizzleAdapter(db, {
       provider: 'sqlite',
       schema: {
@@ -129,17 +143,21 @@ export function createAuth(deps: AuthDeps) {
       ipAddress: { ipAddressHeaders: ['cf-connecting-ip'] },
     },
     plugins: [
-      emailOTP({
-        otpLength: 6,
-        expiresIn: 600,
-        async sendVerificationOTP({ email, otp }) {
-          await env.EMAIL.send({
-            to: email,
-            from: { email: env.EMAIL_FROM, name: site.name },
-            ...emailCopy(site.defaultLocale).signInCode({ siteName: site.name, otp }),
-          });
-        },
-      }),
+      ...(site.auth?.emailOtp === false
+        ? []
+        : [
+            emailOTP({
+              otpLength: 6,
+              expiresIn: 600,
+              async sendVerificationOTP({ email, otp }) {
+                await env.EMAIL.send({
+                  to: email,
+                  from: { email: env.EMAIL_FROM, name: site.name },
+                  ...emailCopy(site.defaultLocale).signInCode({ siteName: site.name, otp }),
+                });
+              },
+            }),
+          ]),
       ...(google.google ? [oneTap()] : []),
     ],
     databaseHooks: {

@@ -4,6 +4,6 @@ let client: SiteAuthClient | null = null;
 
 /** Browser auth client, created from the public config on first call. */
 export function authClient(googleClientId: string | null): SiteAuthClient {
-  client ??= createSiteAuthClient({ googleClientId });
+  client ??= createSiteAuthClient({ googleClientId, emailOtp: false });
   return client;
 }

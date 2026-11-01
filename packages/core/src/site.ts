@@ -66,6 +66,10 @@ export interface SiteConfig {
         automaticTax: boolean;
       }
     | { provider: 'paypal' };
+  /** Sign-in methods. Email one-time codes stay on unless a site turns them off. */
+  auth?: {
+    emailOtp?: boolean;
+  };
   analytics?: {
     ga4?: string;
     clarity?: string;

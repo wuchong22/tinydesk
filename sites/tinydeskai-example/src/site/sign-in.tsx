@@ -1,10 +1,10 @@
 import { getRouteApi } from '@tanstack/react-router';
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { authClient } from '~/lib/auth';
 import { track } from '~/lib/track';
 import { m } from '~/paraglide/messages.js';
 
-// Sign-in dialog: Google button (Google's own popup, no page navigation, stage photos stay) + email code.
+// Sign-in dialog: Continue with Google (Google's own popup, no page navigation, stage photos stay).
 // Open it anywhere with openSignIn(); pass then to continue after sign-in (e.g. resume generation). The /login page reuses SignInPanel.
 
 const OPEN_EVENT = 'tinydesk:sign-in';
@@ -128,12 +128,7 @@ export function SignInDialog() {
 
 export function SignInPanel({ onDone }: { onDone: () => void }) {
   const config = root.useLoaderData();
-  const auth = authClient(config.googleClientId);
   const google = useRef<HTMLDivElement>(null);
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'email' | 'code'>('email');
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const done = useRef(onDone);
   done.current = onDone;
@@ -169,76 +164,19 @@ export function SignInPanel({ onDone }: { onDone: () => void }) {
     };
   }, [config.googleClientId]);
 
-  async function sendCode(event: FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    const result = await auth.emailOtp.sendVerificationOtp({ email, type: 'sign-in' });
-    setBusy(false);
-    if (result.error) setError(result.error.message ?? m.common_sign_in_send_failed());
-    else {
-      track('sign_in_code_sent');
-      setStep('code');
-    }
-  }
-
-  async function verify(event: FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    const result = await auth.signIn.emailOtp({ email, otp });
-    setBusy(false);
-    track(result.error ? 'sign_in_failed' : 'sign_in', { method: 'email' });
-    if (result.error) setError(result.error.message ?? m.common_sign_in_invalid_code());
-    else onDone();
+  if (!config.googleClientId) {
+    return (
+      <div className="sign-in">
+        <button type="button" className="primary" disabled>
+          Google sign-in coming soon
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="sign-in">
-      {config.googleClientId && (
-        <>
-          <div ref={google} className="google-button" />
-          <p className="or mono">{m.common_sign_in_or_email()}</p>
-        </>
-      )}
-      {step === 'email' ? (
-        <form onSubmit={sendCode}>
-          <label>
-            {m.common_sign_in_email()}
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-          </label>
-          <button type="submit" className="primary" disabled={busy}>
-            {busy ? m.common_sign_in_sending() : m.common_sign_in_send_code()}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={verify}>
-          <p>{m.common_sign_in_code_sent({ email })}</p>
-          <label>
-            {m.common_sign_in_code()}
-            <input
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              required
-              autoComplete="one-time-code"
-            />
-          </label>
-          <button type="submit" className="primary" disabled={busy}>
-            {busy ? m.common_sign_in_signing_in() : m.common_sign_in_submit()}
-          </button>
-          <button type="button" className="link-button" onClick={() => setStep('email')}>
-            {m.common_sign_in_other_email()}
-          </button>
-        </form>
-      )}
+      <div ref={google} className="google-button" />
       {error && <p className="error">{error}</p>}
     </div>
   );

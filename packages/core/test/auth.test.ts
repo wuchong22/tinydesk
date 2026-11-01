@@ -42,4 +42,33 @@ describe('auth secret', () => {
     );
     expect(response.status).toBe(404);
   });
+
+  it('keeps email code routes when a site has not turned them off', async () => {
+    const response = await postOtp(auth('x'.repeat(32)), '/email-otp/send-verification-otp');
+    expect(response.status).not.toBe(404);
+  });
+
+  it('disables email code sign-in and sending when the site turns email OTP off', async () => {
+    const googleOnly = createAuth({
+      db,
+      env: { BETTER_AUTH_SECRET: 'x'.repeat(32) } as unknown as CoreEnv,
+      site: defineSite({ ...site, auth: { emailOtp: false } }),
+      baseURL: 'https://test.example',
+      log: () => {},
+    });
+    for (const path of ['/email-otp/send-verification-otp', '/sign-in/email-otp']) {
+      const response = await postOtp(googleOnly, path);
+      expect(response.status).toBe(404);
+    }
+  });
 });
+
+function postOtp(instance: ReturnType<typeof createAuth>, path: string) {
+  return instance.handler(
+    new Request(`https://test.example/api/auth${path}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: 'https://test.example' },
+      body: JSON.stringify({ email: 'person@example.com', type: 'sign-in', otp: '000000' }),
+    }),
+  );
+}
