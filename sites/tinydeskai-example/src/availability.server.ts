@@ -46,7 +46,7 @@ export function paymentsOpen(): boolean {
 
 export function paymentsClosedResponse(): Response | null {
   if (paymentsOpen()) return null;
-  return errorResponse(503, 'payments_unavailable', 'Payments are not available yet.');
+  return errorResponse(503, 'payments_unavailable', 'Checkout stays closed until payments are enabled.');
 }
 
 export function publicGenerationOpen(): boolean {
