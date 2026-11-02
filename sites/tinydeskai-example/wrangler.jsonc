@@ -32,7 +32,21 @@
       "class_name": "GenerationWorkflow"
     }
   ],
-  // Compose container (ffmpeg) needs the Workers Paid plan and a local Docker build.
-  // Generation is closed until a model key exists, so this first deploy does not register the container.
+  // Effect compose container: ffmpeg image in packages/jobs/compose. Uses durable_object scheduling.
+  // The instance type (standard-3) is set in start() in server.ts. sleepAfter is 5m, so an idle instance stops.
+  // Public generation stays closed until PUBLIC_GENERATION is set to "1". A model key alone does not open it.
+  // Purchases stay closed until PAYMENTS is set to "1" and both Stripe secrets exist. Do not set PAYMENTS here.
+  "containers": [
+    {
+      "class_name": "ComposeContainer",
+      "scheduling_policy": "durable_object",
+      "images": { "compose": { "dockerfile": "../../packages/jobs/compose/Dockerfile" } }
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "COMPOSE", "class_name": "ComposeContainer" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ComposeContainer"] }],
+  // Local dev neither builds nor runs the container. Production deploy builds it with Docker.
   "dev": { "enable_containers": false }
 }

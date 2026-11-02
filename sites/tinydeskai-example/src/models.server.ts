@@ -3,13 +3,15 @@ import catalog from '../site.models';
 
 // Server only: never import this file from pages or components. site.models.ts holds the public part of each entry.
 
-// One effect: 1.375–19.063 s of the viral TikTok Tiny Desk clip (skips the opening side view of the singer; 17.688 s, 4 shots). Same price for 1–5 people.
+// One effect: the viral original's four shots (band, lead close-up, sax, band), 17.583333 s at 24 fps. Same price for 1–5 people.
 // The whole clip renders in one run: Kling 4.0 edit mode (Edit @video_1) replaces every person who has a photo entirely (face, hair and clothes from the photo);
 // empty seats keep the original coaches. Tested: all 5 swapped 5/5, scene and cuts match the original, $3.06 at 720p, about 6 minutes.
 // Each photo is cleaned up first (prep), and anyone Kling misses is re-rendered shot by shot with Pruna (repair); a charged render is never refunded.
 // An earlier per-shot Seedance 2.0 mini pipeline (outfit photo edits, eye masks, 4 segments, a check per segment) was structurally fragile and was dropped.
-// Assets live in R2 under assets/tinydesk/: full-17s.mp4 is that span of the viral clip as is (720×1280, 24 fps, with the song),
-// used as the reference video, the original for the face check and the base clip.
+// Assets live in R2 under assets/tinydesk/. full-17s.mp4 is a 720×1280 copy of the public encode
+// public/media/viral-coaches.mp4 (540×960, 422 frames). That file already starts on the band shot,
+// with the song at 0 s, so compose must not seek to 1.375 s. Commercial use of this footage is not confirmed.
+// The file is the reference video, the original for the face check and the base clip.
 
 /** Who sits in each seat of the original, by position and outfit, so the model knows whom to replace. This order is the @image_1… order. */
 const WHO = {
@@ -103,14 +105,15 @@ export default serverModels(catalog, {
           referenceVideo: CLIP,
           slots: ['lead', 'sax', 'keys', 'backLeft', 'backRight'],
           prompt: editPrompt,
-          // duration must be a whole number: the 17.688 s reference asks for 18 s, which comes back as 18.04 s with each cut 1–3 frames late; compose re-aligns shot by shot.
+          // duration must be a whole number: the 17.583333 s reference asks for 18 s, which comes back as about 18.04 s with each cut 1–3 frames late; compose re-aligns shot by shot.
           // generate_audio can only be on with Yir; compose swaps the original song back in.
           parameters: { duration: 18, resolution: '720p', aspect_ratio: 'auto' },
           maxCost: '3.40',
-          target: 17.688,
+          target: 17.583333,
           cuts: [5.333, 11.625, 15.0],
           base: CLIP,
           // Original face centers, taken at the start of each one's shot (band 0 s, lead 5.4 s, sax 11.67 s).
+          // YuNet on the 720×1280 copy finds the same people within 0.012 of these points, so the coordinates stay.
           // Threshold 0.45: swapped faces score at most 0.28; the original person present scores 0.78–0.94, and a 2-second leftover side view of the original lead 0.52.
           check: {
             original: CLIP,
@@ -142,11 +145,11 @@ export default serverModels(catalog, {
           },
         },
       ],
-      // Output: the original song from 1.375–19.063 s of the viral clip, 720×1280, 24 fps.
+      // Output: the song extracted from the same already-trimmed clip, so it starts at 0 s. 720×1280, 24 fps.
       compose: {
         audio: 'assets/tinydesk/song.m4a',
-        audioStart: 1.375,
-        audioDuration: 17.688,
+        audioStart: 0,
+        audioDuration: 17.583333,
         width: 720,
         height: 1280,
         fps: 24,

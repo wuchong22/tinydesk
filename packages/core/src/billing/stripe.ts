@@ -11,7 +11,7 @@ import type {
 import { WebhookSignatureError } from './provider';
 
 // Stripe adapter. Conventions:
-// - Prices use inline price_data; no Prices are pre-created in the Stripe dashboard;
+// - A product with refs.stripe uses that dashboard Price. Otherwise the session uses inline price_data.
 // - Our orderId, userId and productId go into metadata on the checkout session, PaymentIntent and Subscription;
 // - paymentRef is the PaymentIntent for one-time payments and the Invoice for each subscription period; chargeRef is always the PaymentIntent.
 
@@ -192,15 +192,17 @@ export class StripeProvider implements PaymentProvider {
         customer: request.customerRef,
         client_reference_id: request.orderId,
         line_items: [
-          {
-            quantity: 1,
-            price_data: {
-              currency: product.price.currency,
-              unit_amount: product.price.amount,
-              product_data: { name: product.name },
-              ...(subscription ? { recurring: { interval: product.interval } } : {}),
-            },
-          },
+          product.refs?.stripe
+            ? { quantity: 1, price: product.refs.stripe }
+            : {
+                quantity: 1,
+                price_data: {
+                  currency: product.price.currency,
+                  unit_amount: product.price.amount,
+                  product_data: { name: product.name },
+                  ...(subscription ? { recurring: { interval: product.interval } } : {}),
+                },
+              },
         ],
         metadata,
         ...(subscription ? { subscription_data: { metadata } } : { payment_intent_data: { metadata } }),

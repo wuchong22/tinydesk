@@ -10,7 +10,7 @@ interface ProductBase {
   id: string;
   name: string;
   price: Price;
-  /** Product IDs for providers that need pre-created products. Stripe uses inline prices and needs none; PayPal subscriptions need a Plan ID (refs.paypal). */
+  /** Provider ids. refs.stripe is a dashboard Price id; without it Stripe uses inline price_data. PayPal subscriptions need refs.paypal. */
   refs?: Record<string, string>;
 }
 

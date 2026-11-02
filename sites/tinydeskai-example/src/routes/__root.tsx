@@ -1,7 +1,7 @@
 import { analyticsScripts } from '@shipwords/core/analytics';
 import { captureAttribution } from '@shipwords/core/react/attribution';
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from '@tanstack/react-router';
-import { type ReactNode, useEffect } from 'react';
+import { createRootRoute, HeadContent, Link, Outlet, Scripts, useRouter } from '@tanstack/react-router';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { authClient } from '~/lib/auth';
 import { getPublicConfig } from '~/lib/public-config';
 import { m } from '~/paraglide/messages.js';
@@ -79,9 +79,18 @@ function Document({ children }: { children: ReactNode }) {
 }
 
 function Layout() {
+  const router = useRouter();
   const config = Route.useLoaderData();
   const auth = authClient(config.googleClientId);
   const session = auth.useSession();
+  const refreshedForAdmin = useRef(false);
+
+  useEffect(() => {
+    // Sign-in happens in a dialog, so the loader still has the signed-out config. Refresh once so an admin can see the test control.
+    if (refreshedForAdmin.current || !session.data || config.generationEnabled) return;
+    refreshedForAdmin.current = true;
+    void router.invalidate();
+  }, [config.generationEnabled, router, session.data]);
 
   useEffect(() => {
     captureAttribution();

@@ -4,6 +4,7 @@ import {
   mapDispute,
   paymentFactFromIntent,
   paymentFactFromInvoice,
+  StripeProvider,
   subscriptionFact,
   webhookTarget,
 } from '../src/billing/stripe';
@@ -110,5 +111,46 @@ describe('Stripe field mapping', () => {
       ref: 'sub_1',
     });
     expect(webhookTarget(event('payment_intent.created', { id: 'pi_3' }))).toBeNull();
+  });
+
+  it('charges a dashboard Price when the product has refs.stripe, and inline price_data otherwise', async () => {
+    const bodies: Array<{ line_items?: Array<Record<string, unknown>> }> = [];
+    const fake = {
+      checkout: {
+        sessions: {
+          create: async (params: { line_items?: Array<Record<string, unknown>> }) => {
+            bodies.push(params);
+            return { url: 'https://pay.example/c', id: 'cs_1' };
+          },
+        },
+      },
+    } as unknown as Stripe;
+    const provider = new StripeProvider(
+      { secretKey: 'sk_test_x', webhookSecret: 'whsec_x', automaticTax: false },
+      fake,
+    );
+    const request = {
+      orderId: 'ord_1',
+      siteId: 'tinydeskaiex',
+      userId: 'u1',
+      customerRef: 'cus_1',
+      successUrl: 'https://tinydeskai.tools/return',
+      cancelUrl: 'https://tinydeskai.tools/',
+    };
+    const pack = {
+      id: 'video_1',
+      kind: 'credits' as const,
+      name: '1 video',
+      price: { amount: 998, currency: 'usd' },
+      credits: 10,
+      expiresDays: null,
+    };
+    await provider.createCheckout({ ...request, product: { ...pack, refs: { stripe: 'price_test' } } });
+    await provider.createCheckout({ ...request, product: pack });
+    expect(bodies[0]?.line_items?.[0]).toEqual({ quantity: 1, price: 'price_test' });
+    expect(bodies[1]?.line_items?.[0]).toMatchObject({
+      quantity: 1,
+      price_data: { currency: 'usd', unit_amount: 998, product_data: { name: '1 video' } },
+    });
   });
 });

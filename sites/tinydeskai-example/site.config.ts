@@ -18,6 +18,7 @@ export default defineSite({
       price: { amount: 998, currency: 'usd' },
       credits: 10,
       expiresDays: null,
+      refs: { stripe: 'price_1UXHv8BWU98pHwbtbtuiLiCX' },
     },
     {
       id: 'video_3',
@@ -26,6 +27,7 @@ export default defineSite({
       price: { amount: 2499, currency: 'usd' },
       credits: 30,
       expiresDays: null,
+      refs: { stripe: 'price_1UXHviBWU98pHwbtX1qB1RvD' },
     },
     {
       id: 'video_10',
@@ -34,6 +36,7 @@ export default defineSite({
       price: { amount: 5999, currency: 'usd' },
       credits: 100,
       expiresDays: null,
+      refs: { stripe: 'price_1UXHwEBWU98pHwbt37vrkLhz' },
     },
   ],
   signup: { bonusCredits: 0, bonusExpiresDays: null, bonusPerIpDaily: 0, bonusSiteDaily: 0 },
