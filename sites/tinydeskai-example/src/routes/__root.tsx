@@ -7,6 +7,7 @@ import { getPublicConfig } from '~/lib/public-config';
 import { m } from '~/paraglide/messages.js';
 import { getLocale, setLocale } from '~/paraglide/runtime.js';
 import { AccountDialog, AccountLink } from '~/site/account';
+import { FooterSocial } from '~/site/footer-social';
 import { GUIDES } from '~/site/guide';
 import { SUPPORT_EMAIL } from '~/site/legal';
 import { PricingDialog, PricingLink } from '~/site/pricing';
@@ -156,6 +157,7 @@ function Layout() {
             </Link>
           ))}
         </nav>
+        <FooterSocial />
       </footer>
       <SignInDialog />
       <PricingDialog />

@@ -1451,6 +1451,47 @@ button:disabled {
   flex-wrap: wrap;
   row-gap: 0.5rem;
 }
+.footer-social {
+  flex-basis: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgb(239 231 218 / 0.35);
+  flex: none;
+}
+.footer-social a svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  display: block;
+}
+.footer-social a[aria-label='Facebook'] {
+  background: #1877f2;
+}
+.footer-social a[aria-label='X'],
+.footer-social a[aria-label='TikTok'] {
+  background: #111;
+}
+.footer-social a[aria-label='Instagram'] {
+  background: #e4405f;
+}
+.footer-social a[aria-label='YouTube'] {
+  background: #ff0000;
+}
+.footer-social a[aria-label='Pinterest'] {
+  background: #e60023;
+}
+.footer-social a:hover {
+  filter: brightness(1.08);
+}
 
 /* Nav avatar: Google avatar, or the initial when missing */
 .avatar {
@@ -1634,6 +1675,18 @@ button:disabled {
   .site-footer .footer-guides {
     flex-direction: column;
     row-gap: 0;
+  }
+  .site-footer nav.footer-social {
+    justify-content: center;
+    margin-inline: 0;
+    gap: 0.5rem;
+  }
+  .site-footer nav.footer-social > a {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
   }
   .presets {
     flex-wrap: nowrap;

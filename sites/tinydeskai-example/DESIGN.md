@@ -24,3 +24,4 @@
 - **Sample captions**: "Made from an AI-generated photo" or "Reference clip, not a live result".
 - **Crew line-up**: not equal-sized cards but a gig-poster line-up: one crew per row, big Anton name (amber on odd rows), a one-line description on the right, thin dividers.
 - **Content pages** (tutorial, template, guides): long poster-paper cards, `#efe6d2` with a faint halftone, ink text, serif headings, Anton tags, mono tables.
+- **Footer social**: one centered row under the existing copyright, legal links and guides. Six circular brand-color buttons (Facebook blue, X black, Instagram rose, YouTube red, TikTok black, Pinterest red) with white glyphs and a thin cream ring so the black circles stay visible on stage black. They link out to the same accounts as Make Fancy Text. On a phone the row stays centered and wraps instead of overflowing.
