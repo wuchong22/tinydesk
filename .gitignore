@@ -29,5 +29,6 @@ playwright-report/
 .claude/
 .impeccable/
 
-# Example media (clips and stills cut from third-party footage) stays out of the repo; see sites/tinydeskai-example/README.md
-sites/tinydeskai-example/public/media/
+# Display files in public/media are tracked so cloud deploys ship them.
+# Local source notes stay out. Generation base and song live in R2, not here.
+sites/tinydeskai-example/public/media/SOURCES.md

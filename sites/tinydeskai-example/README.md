@@ -10,12 +10,11 @@
 - **Pages**: tool home page, tutorial, template page, meme explainer, free page, pricing, policies; FAQ and structured data on each.
 - **Flow**: sign in (Google or email code), buy credits, generate. No guest trial and no signup bonus.
 
-## Media is not in the repo
+## Media
 
-The reference clips, base clips, song and sample videos are cut from third-party footage and music, so they are not committed:
+Pages load the stage, default seat photos, homepage clips and shot clips from `public/media/`. Those files are tracked so a cloud deploy ships them. `public/media/SOURCES.md` stays local.
 
-- `public/media/` (stage photos, sample clips including the dog version) is git-ignored.
-- The R2 objects under `assets/tinydesk/` (`full-17s.mp4`, the clip used as reference, base and check original, and `song.m4a`) are keyed in `src/models.server.ts`.
+The generation base and song are not in git. They are R2 objects under `assets/tinydesk/` (`full-17s.mp4`, the clip used as reference, base and check original, and `song.m4a`), keyed in `src/models.server.ts`.
 
 Use footage and music you have the rights to, or AI-generated base clips, and keep the DMCA page and contact email (both included).
 
