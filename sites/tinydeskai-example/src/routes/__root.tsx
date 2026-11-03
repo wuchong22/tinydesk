@@ -142,14 +142,17 @@ function Layout() {
         <Outlet />
       </main>
       <footer className="site-footer">
-        <span>{m.common_footer_notice({ year: new Date().getFullYear(), name: site.name })}</span>
-        <nav>
-          <Link to="/privacy">{m.common_footer_privacy()}</Link>
-          <Link to="/terms">{m.common_footer_terms()}</Link>
-          <Link to="/refunds">{m.common_footer_refunds()}</Link>
-          <Link to="/dmca">{m.common_footer_dmca()}</Link>
-          <a href={`mailto:${SUPPORT_EMAIL}`}>{m.common_footer_contact()}</a>
-        </nav>
+        <div className="footer-meta">
+          <span>{m.common_footer_notice({ year: new Date().getFullYear(), name: site.name })}</span>
+          <nav className="footer-legal">
+            <Link to="/privacy">{m.common_footer_privacy()}</Link>
+            <Link to="/terms">{m.common_footer_terms()}</Link>
+            <Link to="/refunds">{m.common_footer_refunds()}</Link>
+            <Link to="/dmca">{m.common_footer_dmca()}</Link>
+            <a href={`mailto:${SUPPORT_EMAIL}`}>{m.common_footer_contact()}</a>
+          </nav>
+          <FooterSocial />
+        </div>
         <nav className="footer-guides" aria-label={m.common_footer_guides()}>
           {GUIDES.map((guide) => (
             <Link key={guide.path} to={guide.path}>
@@ -157,7 +160,6 @@ function Layout() {
             </Link>
           ))}
         </nav>
-        <FooterSocial />
       </footer>
       <SignInDialog />
       <PricingDialog />
