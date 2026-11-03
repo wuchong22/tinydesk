@@ -39,71 +39,6 @@ const freeWays = () => [
   },
 ];
 
-// Competitor data: home and pricing pages checked site by site on 2026-10-30; these are the sites ChatGPT ranked highest at the time.
-const generators = (): {
-  name: string;
-  url?: string;
-  people: string;
-  length: string;
-  quality: string;
-  price: string;
-  sound: string;
-}[] => [
-  {
-    name: site.name,
-    people: m.guides_free_gen_us_people(),
-    length: '18 s',
-    quality: '720p',
-    price: formatPrice(site.products[0]),
-    sound: m.guides_free_gen_song_silent(),
-  },
-  {
-    name: 'outstandingtinydesk.net',
-    url: 'https://outstandingtinydesk.net/pricing',
-    people: m.guides_free_gen_up_to_5(),
-    length: '19 s',
-    quality: '720p',
-    price: m.guides_free_gen_otd_price(),
-    sound: m.guides_free_gen_song(),
-  },
-  {
-    name: 'tinydeskai.tv',
-    url: 'https://tinydeskai.tv/pricing',
-    people: '1–2',
-    length: '15 s',
-    quality: '720p / 1080p',
-    price: '$9.99 / $24.99',
-    sound: m.guides_free_gen_ai_sound_silent(),
-  },
-  {
-    name: 'tiny-desk-ai.app',
-    url: 'https://tiny-desk-ai.app/',
-    people: '1–3',
-    length: '15 s',
-    quality: '720p',
-    price: '$9.99',
-    sound: m.guides_free_gen_song(),
-  },
-  {
-    name: 'tiny-desk.org',
-    url: 'https://tiny-desk.org/',
-    people: '1–3',
-    length: '6 / 10 / 15 s',
-    quality: '720p',
-    price: '$9.90',
-    sound: m.guides_free_gen_song(),
-  },
-  {
-    name: 'tinydesk.video',
-    url: 'https://tinydesk.video/',
-    people: '1',
-    length: '11 s',
-    quality: '480p / 720p',
-    price: '$9.90 / $14.90',
-    sound: m.guides_free_gen_song(),
-  },
-];
-
 const faq = (): FaqItem[] => [
   {
     q: m.guides_free_faq1_q(),
@@ -160,44 +95,6 @@ function FreePage() {
         <Link to="/how-to-make-outstanding-tiny-desk-ai-video">{m.guides_free_diy_link()}</Link>
         {m.guides_free_diy_after()}
       </p>
-
-      <h2>{m.guides_free_compare_heading()}</h2>
-      <p className="muted mono">{m.guides_free_compare_checked({ date: checked })}</p>
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              {/* Price is the second column: the table scrolls sideways on phones, and the price must be visible without scrolling. */}
-              <th>{m.guides_free_compare_col_site()}</th>
-              <th>{m.guides_free_compare_col_price()}</th>
-              <th>{m.guides_free_compare_col_people()}</th>
-              <th>{m.guides_free_compare_col_length()}</th>
-              <th>{m.guides_free_compare_col_quality()}</th>
-              <th>{m.guides_free_compare_col_sound()}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {generators().map((g) => (
-              <tr key={g.name}>
-                <td>
-                  {g.url ? (
-                    <a href={g.url} rel="nofollow noopener" target="_blank">
-                      {g.name}
-                    </a>
-                  ) : (
-                    <strong>{g.name}</strong>
-                  )}
-                </td>
-                <td className="mono">{g.price}</td>
-                <td>{g.people}</td>
-                <td className="mono">{g.length}</td>
-                <td>{g.quality}</td>
-                <td>{g.sound}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
       <h2>{m.guides_free_pick_heading()}</h2>
       <ul>
